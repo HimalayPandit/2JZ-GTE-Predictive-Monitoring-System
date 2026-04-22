@@ -7,32 +7,140 @@
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen?style=for-the-badge)]()
 [![Version](https://img.shields.io/badge/version-v1.2.1-blue?style=for-the-badge&logo=semver)]()
 
-**Real-time machine learning–driven predictive monitoring system for the Toyota 2JZ-GTE engine.**
+An advanced, real-time telemetry and machine learning platform engineered for the Toyota 2JZ-GTE engine. This system transforms raw sensor data into actionable insights, predicting potential failures before they occur.
 
 ---
 
-## 🧭 Overview
+## 🧭 Project Vision
 
-A production-oriented telemetry and prediction platform that ingests engine data and performs low-latency inference using hybrid ML models.
+The 2JZ-GTE is a legendary engine, often pushed to extreme limits. This project bridges the gap between conventional tuning and intelligent monitoring.
 
-**Core capabilities:**
-- Real-time ingestion (OBD-II / CAN / simulation)
-- Dual-model inference (`scikit-learn`, `TensorFlow`)
-- WebSocket streaming (~23.6 Hz, ~41 ms latency)
-- Derived metrics (AFR Δ, boost gradient, thermal rates)
-- Fault prediction with confidence scoring
+By leveraging a dual-engine ML approach, the system detects subtle anomalies in sensor data—such as irregular boost gradients or thermal expansion patterns—that traditional threshold-based systems often miss.
+
+### Core Objectives
+
+- **Predictive Maintenance**: Shift from reactive fixes to proactive prevention  
+- **High-Fidelity Telemetry**: Sub-50ms latency for real-time decision-making  
+- **Safety Buffer**: Early detection of lean conditions and turbo instability  
 
 ---
 
-## 🏗 Architecture
+## 🏗 System Architecture
+
+### High-Level Component Map
 
 ```mermaid
-flowchart LR
-    A[Frontend Dashboard<br/>Chart.js + Socket.IO] --> B[WebSocket Server<br/>~23.6 Hz]
-    B --> C[SKLearn Model]
-    B --> D[TensorFlow Model]
-    C --> E[Prediction Engine]
-    D --> E
-    E --> F[Flask API]
-    F --> G[Sensor Ingestion]
-    G --> H[OBD-II / CAN / Simulator]
+graph TD
+    subgraph "Data Source Layer"
+        OBD[OBD-II Interface]
+        CAN[CAN Bus Adapter]
+        SIM[Engine Simulator]
+    end
+
+    subgraph "Processing Core (Backend)"
+        Ingest[Sensor Ingestion Engine]
+        FE[Feature Engineering]
+        Inf[Inference Orchestrator]
+        SKL[scikit-learn: Anomaly Detection]
+        TF[TensorFlow: Deep Prediction]
+    end
+
+    subgraph "Presentation Layer (Frontend)"
+        WS[WebSocket Server]
+        Dash[Responsive Dashboard]
+        Charts[Chart.js Visualization]
+    end
+
+    OBD --> Ingest
+    CAN --> Ingest
+    SIM --> Ingest
+    Ingest --> FE
+    FE --> Inf
+    Inf --> SKL
+    Inf --> TF
+    SKL --> WS
+    TF --> WS
+    WS --> Dash
+    Dash --> Charts
+```
+
+---
+
+## 🛠 Developer Deep Dive
+
+### Mechanism of Prediction
+
+- **Boost Gradient** → Rate of pressure increase  
+- **AFR Delta** → Deviation from target lambda  
+
+### Key Components
+
+- **Feature Engineering**
+  - Located in `backend/processing/`
+  - Derived metrics:
+    - Thermal rate of change  
+    - Oil pressure vs RPM correlation  
+
+- **Dual Inference Pipeline**
+  - **scikit-learn** → anomaly detection  
+  - **TensorFlow** → LSTM/GRU time-series prediction  
+
+---
+
+## 📁 Directory Structure
+
+```text
+├── backend/
+├── frontend/
+├── model/
+├── integrations/
+├── data/
+├── tests/
+└── docker-compose.yml
+```
+
+---
+
+## 🚀 Installation & Usage
+
+### Quickstart (Docker)
+
+```bash
+git clone https://github.com/HimalayPandit/2JZ-GTE-Predictive-Monitoring-System.git
+cd 2JZ-GTE-Predictive-Monitoring-System
+docker-compose up --build
+```
+
+Open: http://localhost:3000
+
+---
+
+## 🚦 Decision Logic & Alerts
+
+```mermaid
+flowchart TD
+    Data[New Data Packet] --> Check{Within Safe Thresholds?}
+    Check -- Yes --> ML[Analyze Patterns]
+    Check -- No --> Critical[CRITICAL ALERT]
+
+    ML --> Trend{Trend Stable?}
+    Trend -- Yes --> Log[Log Data]
+    Trend -- No --> Warning[Predictive Failure Warning]
+
+    Warning --> Notify[Dashboard Notification]
+```
+
+---
+
+## ⚖️ License & Disclaimer
+
+Licensed under **GPL-3.0**
+
+This software is for monitoring and educational purposes only. Use at your own risk.
+
+---
+
+## 👤 Maintainer
+
+Himalay Pandit  
+https://github.com/HimalayPandit
